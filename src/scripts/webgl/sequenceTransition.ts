@@ -56,8 +56,11 @@ interface SequenceOptions {
 }
 
 export async function initSequence(section: HTMLElement): Promise<void> {
-  // Respect the user's motion preference — leave the cinematic fallback in place.
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // WebGL scroll-sequence is forced on for all visitors (by request),
+  // regardless of the prefers-reduced-motion setting.
+  // On phones, scroll-pinning is janky and costly; the stacked fallback is the
+  // better experience, so skip the WebGL pin below a tablet width.
+  if (window.matchMedia('(max-width: 47.99rem)').matches) return;
 
   const canvas = section.querySelector<HTMLCanvasElement>('[data-seq-canvas]');
   const track = section.querySelector<HTMLElement>('[data-seq-track]');

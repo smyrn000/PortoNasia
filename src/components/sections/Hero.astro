@@ -3,8 +3,8 @@ import ResponsiveImage from '@components/ui/ResponsiveImage.astro';
 import { site } from '@lib/site';
 ---
 
-<section class="hero" data-hero>
-  <div class="hero__media">
+<section class="hero" data-hero data-tilt data-tilt-max="4.5" data-tilt-scale="1.05" data-tilt-lift="0">
+  <div class="hero__media" data-tilt-inner>
     <ResponsiveImage
       src="/images/general/home-hero.jpg"
       alt="The communal dining hall from the Living Together project, bathed in warm daylight."
@@ -100,6 +100,12 @@ import { site } from '@lib/site';
   }
   .hero__scroll svg { animation: hero-bob 2.4s var(--ease-inout) infinite; }
   @keyframes hero-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
-  @media (max-width: 40rem) { .hero__scroll { display: none; } }
+  @media (max-width: 40rem) {
+    .hero__scroll { display: none; }
+    .hero { min-height: 88svh; align-items: center; }
+    .hero__tagline { margin-top: 1.1rem; }
+    .hero__actions { gap: 0.6rem; }
+    .hero__actions .btn { flex: 1 1 auto; justify-content: center; }
+  }
   @media (prefers-reduced-motion: reduce) { .hero__scroll svg { animation: none; } }
 </style>

@@ -1,0 +1,131 @@
+---
+/**
+ * <MusicToggle> — a small floating ambient-sound control.
+ *
+ * Browsers block audio with sound until the visitor interacts, so playback
+ * starts on the first click of this button (never autoplays loudly on load).
+ * The choice + position are remembered for the session, so the track keeps
+ * playing as the visitor moves between pages.
+ *
+ * Replace /public/audio/ambient.mp3 with any track to change the music.
+ */
+const track = '/audio/ambient.mp3';
+---
+
+<button id="music-toggle" class="music" type="button" aria-pressed="false"
+  aria-label="Play ambient music">
+  <span class="music__eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+  <span class="music__label">Sound</span>
+</button>
+<audio id="bg-audio" src={track} loop preload="auto"></audio>
+
+<style>
+  .music {
+    position: fixed;
+    right: clamp(1rem, 0.5rem + 1.5vw, 2rem);
+    bottom: clamp(1rem, 0.5rem + 1.5vw, 2rem);
+    z-index: 200;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1rem 0.6rem 0.85rem;
+    background: color-mix(in srgb, var(--color-ink) 90%, transparent);
+    color: var(--color-paper);
+    border: 1px solid rgba(245, 241, 234, 0.18);
+    border-radius: 999px;
+    backdrop-filter: blur(8px);
+    font-size: var(--fs-100);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    box-shadow: var(--shadow-soft);
+    transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+  }
+  .music:hover { transform: translateY(-2px); }
+
+  /* Equaliser bars — still when paused, dancing when playing */
+  .music__eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 14px; }
+  .music__eq i {
+    width: 2px; height: 4px;
+    background: var(--color-paper);
+    border-radius: 1px;
+    transform-origin: bottom;
+  }
+  .music[data-playing] .music__eq i { animation: eq 0.9s ease-in-out infinite; }
+  .music[data-playing] .music__eq i:nth-child(2) { animation-delay: 0.2s; }
+  .music[data-playing] .music__eq i:nth-child(3) { animation-delay: 0.45s; }
+  .music[data-playing] .music__eq i:nth-child(4) { animation-delay: 0.1s; }
+  @keyframes eq { 0%, 100% { height: 4px; } 50% { height: 14px; } }
+
+  .music__label::after { content: ' off'; opacity: 0.7; }
+  .music[data-playing] .music__label::after { content: ' on'; opacity: 0.7; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .music[data-playing] .music__eq i { animation: none; height: 10px; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var btn = document.getElementById('music-toggle');
+    var audio = document.getElementById('bg-audio');
+    if (!btn || !audio) return;
+
+    var TARGET = 0.35;       // gentle background level
+    var ramp = null;
+
+    function fade(to, done) {
+      if (ramp) clearInterval(ramp);
+      ramp = setInterval(function () {
+        var d = to - audio.volume;
+        if (Math.abs(d) < 0.02) {
+          audio.volume = Math.max(0, Math.min(1, to));
+          clearInterval(ramp); ramp = null;
+          if (done) done();
+        } else {
+          audio.volume = Math.max(0, Math.min(1, audio.volume + d * 0.15));
+        }
+      }, 30);
+    }
+
+    function setPlaying(on) {
+      if (on) btn.setAttribute('data-playing', '');
+      else btn.removeAttribute('data-playing');
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.setAttribute('aria-label', on ? 'Mute ambient music' : 'Play ambient music');
+      try { sessionStorage.setItem('music', on ? 'on' : 'off'); } catch (e) {}
+    }
+
+    function play() {
+      audio.volume = 0;
+      var p = audio.play();
+      if (p && p.then) {
+        p.then(function () { fade(TARGET); setPlaying(true); })
+         .catch(function () { setPlaying(false); }); // blocked until a gesture
+      } else { fade(TARGET); setPlaying(true); }
+    }
+    function pause() {
+      fade(0, function () { audio.pause(); });
+      setPlaying(false);
+    }
+
+    // Resume across page navigations within the session.
+    try {
+      var pos = parseFloat(sessionStorage.getItem('music-pos') || '0');
+      if (!isNaN(pos) && pos > 0) audio.currentTime = pos;
+    } catch (e) {}
+    if ((function () { try { return sessionStorage.getItem('music') === 'on'; } catch (e) { return false; } })()) {
+      play(); // allowed if the visitor already interacted earlier this session
+    }
+
+    // Let the intro "Enter" button start the music on its user gesture.
+    window.__startMusic = play;
+
+    btn.addEventListener('click', function () {
+      if (audio.paused) play(); else pause();
+    });
+
+    setInterval(function () {
+      try { if (!audio.paused) sessionStorage.setItem('music-pos', String(audio.currentTime)); } catch (e) {}
+    }, 1000);
+  })();
+</script>

@@ -7,6 +7,8 @@ import '@styles/global.css';
 import SEO from '@components/seo/SEO.astro';
 import Header from '@components/layout/Header.astro';
 import Footer from '@components/layout/Footer.astro';
+import MusicToggle from '@components/layout/MusicToggle.astro';
+import Intro from '@components/layout/Intro.astro';
 
 interface Props {
   title?: string;
@@ -31,10 +33,18 @@ const { title, description, image, type, jsonLd, noindex, mainClass } = Astro.pr
     <meta name="theme-color" content="#f3efe7" />
 
     <!-- Swap no-js -> js as early as possible so reveal animations can arm
-         without ever risking content staying hidden. -->
+         without ever risking content staying hidden. Also decide, flash-free,
+         whether the "Enter" intro veil should show this session. -->
     <script is:inline>
-      document.documentElement.classList.remove('no-js');
-      document.documentElement.classList.add('js');
+      (function () {
+        var d = document.documentElement;
+        d.classList.remove('no-js');
+        d.classList.add('js');
+        try {
+          if (sessionStorage.getItem('entered') === '1') d.classList.add('entered');
+          else d.classList.add('intro-lock');
+        } catch (e) {}
+      })();
     </script>
 
     <!-- Fonts: preconnect + display=swap to avoid blocking render -->
@@ -49,6 +59,7 @@ const { title, description, image, type, jsonLd, noindex, mainClass } = Astro.pr
   </head>
 
   <body>
+    <Intro />
     <a href="#main" class="skip-link">Skip to content</a>
     <Header />
     <main id="main" class={mainClass}>
@@ -56,19 +67,51 @@ const { title, description, image, type, jsonLd, noindex, mainClass } = Astro.pr
     </main>
     <Footer />
 
+    <!-- Floating ambient-sound toggle (starts on first click) -->
+    <MusicToggle />
+
     <!-- Subtle film-grain overlay for a warmer, more tactile, premium feel -->
     <div class="grain" aria-hidden="true"></div>
 
-    <!-- Global progressive enhancement. Each init is isolated so a failure in
-         one (e.g. an optional library) can never break the others. -->
-    <script>
-      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const safe = (fn: () => void) => { try { fn(); } catch (e) { console.warn(e); } };
+    <!-- Smooth scroll (Lenis) loaded as a plain classic script from a CDN, then
+         initialised inline. This deliberately avoids the JS module bundle so it
+         runs in every situation — including when the page is opened directly as
+         a file — where bundled module scripts are blocked by the browser. -->
+    <script
+      is:inline
+      src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"
+    ></script>
+    <script is:inline>
+      (function () {
+        try {
+          // Smooth scroll is forced on for all visitors (by request), regardless
+          // of the prefers-reduced-motion setting.
+          var L = window.Lenis;
+          if (!L) return;
+          var lenis = new L({ duration: 1.15, smoothWheel: true, syncTouch: false });
+          function raf(t) { lenis.raf(t); requestAnimationFrame(raf); }
+          requestAnimationFrame(raf);
+          window.__lenis = lenis;
+          document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+            a.addEventListener('click', function (e) {
+              var id = a.getAttribute('href');
+              if (!id || id === '#') return;
+              var t = document.querySelector(id);
+              if (!t) return;
+              e.preventDefault();
+              lenis.scrollTo(t, { offset: -80 });
+            });
+          });
+        } catch (err) { console.warn('Lenis init failed', err); }
+      })();
+    </script>
 
+    <!-- Other progressive enhancements (reveal animations, 3D tilt). These are
+         bundled module scripts and only run when served over http(s). -->
+    <script>
+      const safe = (fn: () => void) => { try { fn(); } catch (e) { console.warn(e); } };
       import('@/scripts/animations/scrollReveal').then((m) => safe(m.initReveal));
-      if (!reduce) {
-        import('@/scripts/smoothScroll').then((m) => safe(m.initSmoothScroll));
-      }
+      import('@/scripts/interactions/tilt3d').then((m) => safe(m.initTilt));
     </script>
   </body>
 </html>

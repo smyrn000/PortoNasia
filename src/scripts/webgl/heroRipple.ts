@@ -28,39 +28,40 @@ const FRAG = /* glsl */ `
   uniform float uAsp;
   uniform float uCanvas;
 
-  float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-  float noise(vec2 p) {
-    vec2 i = floor(p), f = fract(p);
-    float a = hash(i), b = hash(i + vec2(1.0, 0.0));
-    float c = hash(i + vec2(0.0, 1.0)), d = hash(i + vec2(1.0, 1.0));
-    vec2 u = f * f * (3.0 - 2.0 * f);
-    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
-  }
   vec2 cover(vec2 uv, float texAsp, float canAsp) {
     vec2 s = canAsp > texAsp ? vec2(1.0, texAsp / canAsp) : vec2(canAsp / texAsp, 1.0);
     return (uv - 0.5) * s + 0.5;
   }
 
   void main() {
-    // Gentle, always-on breathing flow.
-    float n = noise(vUv * 3.0 + uTime * 0.05);
-    vec2 flow = (vec2(n, noise(vUv * 3.0 - uTime * 0.05)) - 0.5) * uAmp;
+    // Smooth, continuous flow built from layered sine waves. Unlike hash noise
+    // this has no discontinuities, so the motion reads as a silky liquid drift
+    // rather than a wobble.
+    float t = uTime;
+    vec2 flow;
+    flow.x = sin(vUv.y * 3.5 + t * 0.45) + 0.5 * sin(vUv.y * 6.0 - t * 0.30);
+    flow.y = sin(vUv.x * 3.5 - t * 0.40) + 0.5 * cos(vUv.x * 5.5 + t * 0.35);
+    flow *= uAmp;
 
-    // A soft ripple that radiates from the cursor.
+    // A soft ripple that radiates gently from the cursor.
     float dist = distance(vUv, uMouse);
-    float ripple = sin(dist * 24.0 - uTime * 1.4) * exp(-dist * 6.0) * uHover;
+    float ripple = sin(dist * 16.0 - t * 1.0) * exp(-dist * 5.0) * uHover;
     vec2 toM = normalize(vUv - uMouse + 1e-4);
 
     // Perceptible parallax: the image leans toward the cursor (a clear 3D cue).
-    vec2 parallax = (uMouse - 0.5) * 0.05 * uHover;
+    vec2 parallax = (uMouse - 0.5) * 0.045 * uHover;
 
-    vec2 disp = flow + toM * ripple * 0.02 - parallax;
+    vec2 disp = flow + toM * ripple * 0.014 - parallax;
     gl_FragColor = texture2D(uTex, cover(vUv + disp, uAsp, uCanvas));
   }
 `;
 
 export async function initHeroRipple(): Promise<void> {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // WebGL hero is forced on for all visitors (by request), regardless of the
+  // prefers-reduced-motion setting.
+  // On phones the static hero image (the LCP element) is plenty; skip the
+  // full-screen WebGL canvas to save battery and keep things snappy.
+  if (window.matchMedia('(max-width: 47.99rem)').matches) return;
 
   const hero = document.querySelector<HTMLElement>('[data-hero]');
   const canvas = hero?.querySelector<HTMLCanvasElement>('[data-hero-canvas]');
@@ -103,7 +104,7 @@ export async function initHeroRipple(): Promise<void> {
     uTime: { value: 0 },
     uMouse: { value: new THREE.Vector2(0.5, 0.5) },
     uHover: { value: 0 },
-    uAmp: { value: 0.016 },
+    uAmp: { value: 0.008 },
     uAsp: { value: ti.width / ti.height },
     uCanvas: { value: 1 },
   };

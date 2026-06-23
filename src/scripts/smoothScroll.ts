@@ -1,19 +1,19 @@
 /**
- * Optional smooth scrolling with Lenis, kept deliberately gentle.
- * Only runs when the user has NOT requested reduced motion (guarded by caller).
- * If GSAP/ScrollTrigger is present, Lenis drives its updates so pinned/scrub
- * animations stay in sync.
+ * Smooth scrolling with Lenis.
+ * Runs unless the user prefers reduced motion (guarded by the caller).
+ * Touch scrolling stays native (Lenis only smooths the wheel) so mobile feels
+ * normal. If GSAP/ScrollTrigger is present, Lenis drives its updates so
+ * pinned/scrub animations stay in sync.
  */
 import Lenis from 'lenis';
 
 export function initSmoothScroll(): void {
-  // Skip on touch devices where native momentum scrolling feels better.
-  if (window.matchMedia('(pointer: coarse)').matches) return;
-
   const lenis = new Lenis({
-    duration: 1.1,
+    duration: 1.15,
     easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     smoothWheel: true,
+    // Leave touch scrolling native — smoothing it tends to feel laggy.
+    syncTouch: false,
   });
 
   function raf(time: number) {
@@ -21,6 +21,18 @@ export function initSmoothScroll(): void {
     requestAnimationFrame(raf);
   }
   requestAnimationFrame(raf);
+
+  // Smoothly scroll to in-page anchors (e.g. the hero "Scroll" cue -> #featured).
+  document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      const id = a.getAttribute('href');
+      if (!id || id === '#') return;
+      const target = document.querySelector(id);
+      if (!target) return;
+      e.preventDefault();
+      lenis.scrollTo(target as HTMLElement, { offset: -80 });
+    });
+  });
 
   // Expose for ScrollTrigger integration (see project page animations).
   (window as unknown as { __lenis?: Lenis }).__lenis = lenis;

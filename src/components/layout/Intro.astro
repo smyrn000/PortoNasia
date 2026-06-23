@@ -1,0 +1,172 @@
+---
+/**
+ * <Intro> — an "Enter site" veil shown once per session.
+ *
+ * The studio name animates in; clicking "Enter" starts the ambient music
+ * (the click satisfies the browser's audio-gesture requirement) and a curtain
+ * of panels rises to reveal the site.
+ *
+ * Robustness:
+ *  - Shown only when JS is available (.js) and not yet entered this session,
+ *    so it can never trap a no-JS visitor.
+ *  - Uses an inline classic script, so it runs even if module bundles don't.
+ *  - Scroll is locked while the veil is up and released on enter.
+ */
+import { site } from '@lib/site';
+const [first, ...rest] = site.name.split(' ');
+---
+
+<div id="intro" class="intro" role="dialog" aria-label="Enter site" aria-modal="true">
+  <div class="intro__panels" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <div class="intro__glow" aria-hidden="true"></div>
+
+  <div class="intro__content">
+    <p class="eyebrow intro__eyebrow">Interior Architecture — Portfolio</p>
+    <h1 class="intro__name display">
+      <span>{first}</span>
+      <span>{rest.join(' ')}</span>
+    </h1>
+    <span class="intro__rule" aria-hidden="true"></span>
+    <button class="intro__enter" type="button" data-enter>
+      <span class="intro__enter-label">Enter</span>
+      <span class="intro__enter-sub">
+        <svg width="13" height="13" viewBox="0 0 13 13" aria-hidden="true"><path d="M2 9V4h2l3-2v9L4 9H2zM9.5 3.5a3 3 0 010 6" stroke="currentColor" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        with sound
+      </span>
+    </button>
+  </div>
+</div>
+
+<style>
+  .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  /* Only ever show when JS is on and the visitor hasn't entered yet */
+  :global(html.js:not(.entered)) .intro { display: flex; }
+  :global(html.intro-lock),
+  :global(html.intro-lock body) { overflow: hidden; }
+
+  .intro__panels { position: absolute; inset: 0; display: flex; z-index: 0; }
+  .intro__panels span {
+    flex: 1;
+    background: var(--color-ink);
+    transition: transform 1s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+  /* Subtle terracotta tint on the centre panel */
+  .intro__panels span:nth-child(3) { background: color-mix(in srgb, var(--color-ink) 88%, var(--color-accent)); }
+
+  .intro__glow {
+    position: absolute;
+    width: 60vmax; height: 60vmax;
+    background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 55%, transparent) 0%, transparent 60%);
+    filter: blur(40px);
+    opacity: 0.4;
+    z-index: 1;
+    animation: introGlow 6s ease-in-out infinite;
+  }
+  @keyframes introGlow { 0%, 100% { transform: scale(1); opacity: 0.32; } 50% { transform: scale(1.15); opacity: 0.5; } }
+
+  .intro__content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: var(--color-paper);
+    padding: var(--gutter);
+  }
+  .intro__eyebrow { color: rgba(245, 241, 234, 0.7); }
+  .intro__name {
+    font-size: var(--fs-900);
+    line-height: 0.95;
+    font-weight: 330;
+    margin: 1rem 0 0;
+  }
+  .intro__name span { display: block; }
+  .intro__name span:last-child { font-style: italic; color: var(--color-sand); }
+
+  .intro__rule { display: block; height: 1px; width: 0; margin: 1.75rem auto; background: var(--color-accent); }
+
+  .intro__enter {
+    margin-top: 0.5rem;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    background: transparent;
+    color: var(--color-paper);
+    border: 1px solid rgba(245, 241, 234, 0.4);
+    border-radius: 999px;
+    padding: 1rem 2.4rem;
+    transition: background 0.4s var(--ease-out), color 0.4s var(--ease-out), transform 0.3s var(--ease-out);
+  }
+  .intro__enter:hover { background: var(--color-paper); color: var(--color-ink); transform: translateY(-2px); }
+  .intro__enter-label { font-family: var(--font-display); font-size: var(--fs-500); }
+  .intro__enter-sub {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: var(--fs-100); letter-spacing: var(--tracking-label);
+    text-transform: uppercase; opacity: 0.7;
+  }
+
+  /* Entrance animation */
+  .intro__eyebrow, .intro__name span, .intro__enter {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: introUp 0.95s var(--ease-out) forwards;
+  }
+  .intro__name span:nth-child(1) { animation-delay: 0.28s; }
+  .intro__name span:nth-child(2) { animation-delay: 0.42s; }
+  .intro__rule { animation: introRule 1s var(--ease-out) 0.7s forwards; }
+  .intro__enter { animation-delay: 0.95s; }
+  @keyframes introUp { to { opacity: 1; transform: none; } }
+  @keyframes introRule { to { width: min(60vw, 22rem); } }
+
+  /* Leaving: panels rise like a curtain, content lifts away */
+  .intro[data-leaving] { pointer-events: none; }
+  .intro[data-leaving] .intro__content,
+  .intro[data-leaving] .intro__glow {
+    opacity: 0;
+    transform: translateY(-16px);
+    transition: opacity 0.45s var(--ease-out), transform 0.45s var(--ease-out);
+  }
+  .intro[data-leaving] .intro__panels span { transform: translateY(-101%); }
+  .intro[data-leaving] .intro__panels span:nth-child(1) { transition-delay: 0.20s; }
+  .intro[data-leaving] .intro__panels span:nth-child(2) { transition-delay: 0.30s; }
+  .intro[data-leaving] .intro__panels span:nth-child(3) { transition-delay: 0.40s; }
+  .intro[data-leaving] .intro__panels span:nth-child(4) { transition-delay: 0.30s; }
+  .intro[data-leaving] .intro__panels span:nth-child(5) { transition-delay: 0.20s; }
+</style>
+
+<script is:inline>
+  (function () {
+    var intro = document.getElementById('intro');
+    if (!intro) return;
+    var d = document.documentElement;
+
+    var btn = intro.querySelector('[data-enter]');
+    if (!btn) { d.classList.remove('intro-lock'); return; }
+
+    function enter() {
+      try { sessionStorage.setItem('entered', '1'); } catch (e) {}
+      if (typeof window.__startMusic === 'function') window.__startMusic();
+      d.classList.remove('intro-lock');
+      intro.setAttribute('data-leaving', '');
+      window.setTimeout(function () { if (intro && intro.parentNode) intro.remove(); }, 1500);
+    }
+
+    btn.addEventListener('click', enter);
+    // Allow Enter/Space from the keyboard too (button already does, this is belt-and-braces)
+    document.addEventListener('keydown', function (e) {
+      if ((e.key === 'Enter' || e.key === ' ') && !intro.hasAttribute('data-leaving') &&
+          d.classList.contains('intro-lock')) {
+        e.preventDefault(); enter();
+      }
+    });
+  })();
+</script>

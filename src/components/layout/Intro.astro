@@ -156,6 +156,11 @@ const [first, ...rest] = site.name.split(' ');
       try { sessionStorage.setItem('entered', '1'); } catch (e) {}
       if (typeof window.__startMusic === 'function') window.__startMusic();
       d.classList.remove('intro-lock');
+      // Always reveal the site from the very top, even if the page was reloaded
+      // partway down (the browser may have restored a scroll position).
+      var L = window.__lenis;
+      if (L && typeof L.scrollTo === 'function') L.scrollTo(0, { immediate: true });
+      window.scrollTo(0, 0);
       intro.setAttribute('data-leaving', '');
       window.setTimeout(function () { if (intro && intro.parentNode) intro.remove(); }, 1500);
     }

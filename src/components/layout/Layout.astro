@@ -41,9 +41,19 @@ const { title, description, image, type, jsonLd, noindex, mainClass } = Astro.pr
         d.classList.remove('no-js');
         d.classList.add('js');
         try {
-          if (sessionStorage.getItem('entered') === '1') d.classList.add('entered');
-          else d.classList.add('intro-lock');
-        } catch (e) {}
+          var p = location.pathname;
+          var isHome = p === '/' || p === '' || /index\.html?$/.test(p);
+          var sameSite = !!document.referrer && document.referrer.indexOf(location.origin) === 0;
+          var navEntry = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || null;
+          var reloaded = navEntry ? navEntry.type === 'reload'
+            : (performance.navigation && performance.navigation.type === 1);
+          // Show the intro on a fresh visit or reload of the home page; skip it
+          // for in-site navigation (so internal links don't replay it).
+          if (isHome && (!sameSite || reloaded)) d.classList.add('intro-lock');
+          else d.classList.add('entered');
+        } catch (e) {
+          d.classList.add('intro-lock');
+        }
       })();
     </script>
 

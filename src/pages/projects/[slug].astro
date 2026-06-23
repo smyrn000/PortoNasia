@@ -1,0 +1,283 @@
+---
+import Layout from '@components/layout/Layout.astro';
+import ResponsiveImage from '@components/ui/ResponsiveImage.astro';
+import ProjectGallery from '@components/projects/ProjectGallery.astro';
+import BeforeAfterSlider from '@components/projects/BeforeAfterSlider.astro';
+import SequenceTransition from '@components/projects/SequenceTransition.astro';
+import { getCollection, render } from 'astro:content';
+import { site } from '@lib/site';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects', ({ data }) => !data.draft))
+    .sort((a, b) => a.data.order - b.data.order);
+
+  return projects.map((entry, i) => {
+    const next = projects[(i + 1) % projects.length];
+    return {
+      params: { slug: entry.data.slug ?? entry.id },
+      props: { entry, next },
+    };
+  });
+}
+
+const { entry, next } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+const slug = data.slug ?? entry.id;
+const nextSlug = next.data.slug ?? next.id;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: data.title,
+  description: data.summary,
+  url: `${site.url}/projects/${slug}/`,
+  image: site.url + data.cover.src,
+  dateCreated: String(data.year),
+  locationCreated: { '@type': 'Place', name: data.location },
+  creator: { '@type': 'Person', name: site.name, jobTitle: site.role },
+  genre: data.category,
+};
+---
+
+<Layout
+  title={data.title}
+  description={data.seoDescription ?? data.summary}
+  image={data.cover.src}
+  type="article"
+  jsonLd={jsonLd}
+  mainClass="project"
+>
+  <!-- Hero -->
+  <header class="project-hero" data-project-hero>
+    <div class="project-hero__media">
+      <ResponsiveImage
+        src={data.cover.src}
+        alt={data.cover.alt}
+        sizes="100vw"
+        priority
+        class="project-hero__img"
+      />
+      <div class="project-hero__scrim"></div>
+    </div>
+    <div class="container container--wide project-hero__content">
+      <p class="eyebrow project-hero__eyebrow">{data.category}</p>
+      <h1 class="project-hero__title display">{data.title}</h1>
+      <p class="project-hero__meta">{data.location} · {data.year}</p>
+    </div>
+  </header>
+
+  <!-- Overview + meta -->
+  <section class="section project-overview">
+    <div class="container container--wide project-overview__grid">
+      <div class="prose" data-reveal>
+        <p class="project-overview__summary lead">{data.summary}</p>
+        <Content />
+      </div>
+
+      <aside class="project-meta" data-reveal aria-label="Project details">
+        <dl class="project-meta__list">
+          <div><dt>Location</dt><dd>{data.location}</dd></div>
+          <div><dt>Year</dt><dd>{data.year}</dd></div>
+          <div><dt>Category</dt><dd>{data.category}</dd></div>
+          {data.services.length > 0 && (
+            <div>
+              <dt>Services</dt>
+              <dd>
+                <ul role="list" class="project-meta__services">
+                  {data.services.map((s) => <li>{s}</li>)}
+                </ul>
+              </dd>
+            </div>
+          )}
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  {data.concept && data.concept.length > 0 && (
+    <section class="section--tight">
+      <div class="container container--wide">
+        <div class="project-concept" data-reveal data-parallax>
+          {data.concept.map((c) => (
+            <figure class="project-concept__fig">
+              <ResponsiveImage src={c.src} alt={c.alt} sizes="(min-width:64rem) 50vw, 100vw" />
+              {c.caption && <figcaption>{c.caption}</figcaption>}
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Scroll-driven sequence (WebGL) -->
+  {data.sequence && (
+    <SequenceTransition
+      frames={[...data.sequence.frames]}
+      eyebrow={data.sequence.eyebrow}
+      intensity={data.sequence.intensity}
+    />
+  )}
+
+  <!-- Gallery -->
+  {data.gallery.length > 0 && (
+    <section class="section" id="gallery">
+      <div class="container container--wide">
+        <h2 class="project-section-h" data-reveal>Inside the project</h2>
+        <ProjectGallery images={[...data.gallery]} />
+      </div>
+    </section>
+  )}
+
+  <!-- Before / after -->
+  {data.beforeAfter && data.beforeAfter.length > 0 && (
+    <section class="section--tight">
+      <div class="container container--wide">
+        <h2 class="project-section-h" data-reveal>Before &amp; after</h2>
+        <div class="project-ba">
+          {data.beforeAfter.map((ba) => (
+            <BeforeAfterSlider before={ba.before} after={ba.after} label={ba.label} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Plans / drawings -->
+  {data.plans && data.plans.length > 0 && (
+    <section class="section" id="drawings">
+      <div class="container container--wide">
+        <h2 class="project-section-h" data-reveal>Plans &amp; drawings</h2>
+        <ProjectGallery images={[...data.plans]} sizes="(min-width:64rem) 50vw, 100vw" />
+      </div>
+    </section>
+  )}
+
+  <!-- Testimonial -->
+  {data.testimonial && (
+    <section class="section--tight">
+      <div class="container container--text">
+        <blockquote class="project-quote" data-reveal>
+          <p>“{data.testimonial.quote}”</p>
+          <footer>
+            — {data.testimonial.author}
+            {data.testimonial.role && <span>, {data.testimonial.role}</span>}
+          </footer>
+        </blockquote>
+      </div>
+    </section>
+  )}
+
+  <!-- Next project -->
+  <nav class="next-project" aria-label="Next project">
+    <a href={`/projects/${nextSlug}/`} class="next-project__link">
+      <div class="container container--wide next-project__inner">
+        <span class="eyebrow">Next project</span>
+        <span class="next-project__title display">{next.data.title}</span>
+        <span class="arrow-link">
+          View
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true">
+            <path d="M1 6h13M9 1l5 5-5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </div>
+    </a>
+  </nav>
+
+  <script>
+    import { initProjectHero } from '@/scripts/animations/projectHero';
+    initProjectHero();
+  </script>
+</Layout>
+
+<style>
+  /* Hero */
+  .project-hero {
+    position: relative;
+    min-height: clamp(26rem, 78svh, 44rem);
+    display: flex;
+    align-items: flex-end;
+    color: var(--color-paper);
+    overflow: hidden;
+    margin-top: calc(-1 * var(--header-h));
+    padding-top: var(--header-h);
+  }
+  .project-hero__media { position: absolute; inset: 0; z-index: -1; }
+  .project-hero__img { position: absolute; left: 0; right: 0; top: -9%; height: 118%; }
+  .project-hero__img :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .project-hero__scrim {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(20,17,13,0.72) 0%, rgba(20,17,13,0.1) 55%, rgba(20,17,13,0.2) 100%);
+  }
+  .project-hero__content { padding-bottom: clamp(2.5rem, 1rem + 5vw, 5rem); width: 100%; }
+  .project-hero__eyebrow { color: rgba(245,241,234,0.85); }
+  .project-hero__title { font-size: var(--fs-900); font-weight: 330; margin: 0.6rem 0 0.75rem; }
+  .project-hero__meta {
+    font-size: var(--fs-200); letter-spacing: var(--tracking-wide);
+    text-transform: uppercase; color: rgba(245,241,234,0.85);
+  }
+
+  /* Overview */
+  .project-overview__grid {
+    display: grid;
+    grid-template-columns: 1fr 18rem;
+    gap: clamp(2rem, 1rem + 5vw, 5rem);
+    align-items: start;
+  }
+  .project-overview__summary { color: var(--color-ink); font-size: var(--fs-500); }
+  .project-meta { position: sticky; top: calc(var(--header-h) + 1.5rem); }
+  .project-meta__list { display: grid; gap: 1.25rem; }
+  .project-meta__list dt {
+    font-size: var(--fs-100); letter-spacing: var(--tracking-label);
+    text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.3rem;
+  }
+  .project-meta__list dd { font-size: var(--fs-300); }
+  .project-meta__services { display: grid; gap: 0.3rem; }
+  .project-meta__list > div { border-top: 1px solid var(--color-line); padding-top: 1rem; }
+
+  @media (max-width: 56rem) {
+    .project-overview__grid { grid-template-columns: 1fr; }
+    .project-meta { position: static; }
+  }
+
+  /* Concept — centred, capped width so portrait images never blow up */
+  .project-concept {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(1.5rem, 1rem + 2vw, 3rem);
+  }
+  .project-concept__fig {
+    flex: 0 1 32rem;
+    max-width: 32rem;
+    margin: 0;
+    text-align: center;
+  }
+  .project-concept__fig :global(.rimg) { border-radius: var(--radius); overflow: hidden; background: var(--color-paper-2); }
+  .project-concept__fig figcaption { margin-top: 0.8rem; font-size: var(--fs-200); color: var(--color-muted); }
+
+  .project-section-h { font-size: var(--fs-600); margin-bottom: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
+  .project-ba { display: grid; gap: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
+
+  /* Quote */
+  .project-quote { text-align: center; }
+  .project-quote p {
+    font-family: var(--font-display); font-style: italic;
+    font-size: var(--fs-600); line-height: 1.3; color: var(--color-ink);
+  }
+  .project-quote footer {
+    margin-top: 1.5rem; font-size: var(--fs-200);
+    letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--color-muted);
+  }
+
+  /* Next project */
+  .next-project { background: var(--color-ink); color: var(--color-paper); }
+  .next-project__inner {
+    display: flex; flex-direction: column; gap: 0.5rem;
+    padding-block: clamp(3rem, 2rem + 4vw, 5.5rem);
+  }
+  .next-project .eyebrow { color: rgba(245,241,234,0.6); }
+  .next-project__title { font-size: var(--fs-800); }
+  .next-project .arrow-link { margin-top: 0.75rem; color: var(--color-sand); }
+  .next-project__link:hover .next-project__title { color: var(--color-sand); transition: color var(--dur) var(--ease-out); }
+</style>

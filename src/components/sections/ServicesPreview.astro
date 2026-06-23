@@ -1,0 +1,61 @@
+---
+import { services } from '@lib/services';
+const preview = services.slice(0, 4);
+---
+
+<section class="section section--tight services-preview">
+  <div class="container container--wide">
+    <div class="services-preview__grid">
+      <div class="services-preview__intro" data-reveal>
+        <p class="eyebrow">What I do</p>
+        <h2>From first sketch to the final, lived-in room.</h2>
+        <p class="lead">
+          A focused interior architecture practice covering the whole journey —
+          concept, space planning, materials, joinery and visualisation.
+        </p>
+        <a href="/services/" class="arrow-link">
+          All services
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true">
+            <path d="M1 6h13M9 1l5 5-5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+
+      <ul class="services-preview__list" role="list">
+        {preview.map((s, i) => (
+          <li class="services-preview__item" data-reveal style={`--i:${i}`}>
+            <h3>{s.title}</h3>
+            <p>{s.summary}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .services-preview { background: var(--color-paper-2); }
+  .services-preview__grid {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: clamp(2rem, 1rem + 5vw, 5rem);
+  }
+  .services-preview__intro h2 { margin: 0.8rem 0 1rem; font-size: var(--fs-600); }
+  .services-preview__intro .arrow-link { margin-top: 1.5rem; color: var(--color-accent-deep); }
+
+  .services-preview__list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+  }
+  .services-preview__item { border-top: 1px solid var(--color-line); padding-top: 1.25rem; }
+  .services-preview__item h3 { font-size: var(--fs-500); margin-bottom: 0.5rem; }
+  .services-preview__item p { color: var(--color-ink-soft); font-size: var(--fs-200); line-height: 1.6; }
+
+  @media (max-width: 52rem) {
+    .services-preview__grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 34rem) {
+    .services-preview__list { grid-template-columns: 1fr; }
+  }
+</style>

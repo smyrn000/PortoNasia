@@ -1,0 +1,24 @@
+# build output
+dist/
+.output/
+
+# dependencies
+node_modules/
+
+# astro
+.astro/
+
+# logs & env
+npm-debug.log*
+.env
+.env.production
+.DS_Store
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# original source assets (large; not needed for the deployed site)
+# Comment out the next line if you want to version the raw renders/PDFs too.
+source-assets/

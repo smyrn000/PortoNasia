@@ -1,0 +1,159 @@
+---
+import { site, navLinks } from '@lib/site';
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href.replace(/\/$/, ''));
+---
+
+<header class="site-header" data-header>
+  <div class="container container--wide site-header__inner">
+    <a href="/" class="site-header__brand" aria-label={`${site.name} — home`}>
+      <span class="site-header__name">{site.name}</span>
+      <span class="site-header__role">{site.role}</span>
+    </a>
+
+    <nav class="site-nav" aria-label="Primary">
+      <button
+        class="site-nav__toggle"
+        aria-expanded="false"
+        aria-controls="primary-menu"
+        data-nav-toggle
+      >
+        <span class="visually-hidden">Menu</span>
+        <span class="site-nav__bars" aria-hidden="true"><i></i><i></i></span>
+      </button>
+
+      <ul id="primary-menu" class="site-nav__list" role="list" data-nav-menu>
+        {navLinks.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="site-nav__link link-underline"
+              aria-current={isActive(link.href) ? 'page' : undefined}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--color-paper) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--dur) var(--ease-out),
+                background var(--dur) var(--ease-out);
+  }
+  .site-header[data-scrolled] { border-bottom-color: var(--color-line); }
+
+  .site-header__inner {
+    min-height: var(--header-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .site-header__brand { display: flex; flex-direction: column; line-height: 1.1; }
+  .site-header__name {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 420;
+    letter-spacing: 0.01em;
+  }
+  .site-header__role {
+    font-size: var(--fs-100);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .site-nav__list {
+    display: flex;
+    align-items: center;
+    gap: clamp(1.25rem, 0.5rem + 2vw, 2.75rem);
+    margin: 0;
+  }
+  .site-nav__link {
+    font-size: var(--fs-200);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .site-nav__link[aria-current='page'] { color: var(--color-accent); }
+
+  .site-nav__toggle {
+    display: none;
+    background: none;
+    border: none;
+    padding: 0.5rem;
+  }
+  .site-nav__bars { display: block; width: 26px; }
+  .site-nav__bars i {
+    display: block;
+    height: 1.5px;
+    background: var(--color-ink);
+    transition: transform var(--dur-fast) var(--ease-out),
+                opacity var(--dur-fast) var(--ease-out);
+  }
+  .site-nav__bars i + i { margin-top: 7px; }
+
+  @media (max-width: 48rem) {
+    .site-nav__toggle { display: block; z-index: 2; }
+    .site-nav__list {
+      position: fixed;
+      inset: var(--header-h) 0 auto 0;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+      padding: 1.5rem var(--gutter) 2.5rem;
+      background: var(--color-paper);
+      border-bottom: 1px solid var(--color-line);
+      transform: translateY(-110%);
+      transition: transform var(--dur) var(--ease-out);
+    }
+    .site-nav[data-open] .site-nav__list { transform: translateY(0); }
+    .site-nav__link { font-size: var(--fs-500); padding-block: 0.4rem; }
+    .site-nav[data-open] .site-nav__bars i:first-child { transform: translateY(4.25px) rotate(45deg); }
+    .site-nav[data-open] .site-nav__bars i:last-child { transform: translateY(-4.25px) rotate(-45deg); }
+  }
+</style>
+
+<script>
+  const header = document.querySelector('[data-header]') as HTMLElement | null;
+  const nav = document.querySelector('.site-nav') as HTMLElement | null;
+  const toggle = document.querySelector('[data-nav-toggle]') as HTMLButtonElement | null;
+
+  // Sticky header border on scroll
+  if (header) {
+    const onScroll = () => {
+      if (window.scrollY > 8) header.setAttribute('data-scrolled', '');
+      else header.removeAttribute('data-scrolled');
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  // Mobile menu
+  if (nav && toggle) {
+    const close = () => {
+      nav.removeAttribute('data-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    };
+    toggle.addEventListener('click', () => {
+      const open = nav.toggleAttribute('data-open');
+      toggle.setAttribute('aria-expanded', String(open));
+    });
+    nav.querySelectorAll('a').forEach((a) => a.addEventListener('click', close));
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') close();
+    });
+  }
+</script>

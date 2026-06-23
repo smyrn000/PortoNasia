@@ -1,0 +1,169 @@
+---
+/**
+ * <SequenceTransition> — a pinned, scroll-driven WebGL crossfade through a set
+ * of related frames. Rendered only when a project defines `sequence`.
+ *
+ * Without WebGL / under reduced motion it degrades to a cinematic, full-bleed
+ * stacked story — each frame with an overlaid caption — so it always looks
+ * intentional, never broken.
+ */
+import ResponsiveImage from '@components/ui/ResponsiveImage.astro';
+import { resolveImage } from '@lib/images';
+
+type Frame = { src: string; alt: string; caption: string };
+interface Props {
+  frames: Frame[];
+  eyebrow?: string;
+  title?: string;
+  intensity?: number;
+  displacement?: string;
+}
+const {
+  frames,
+  eyebrow = 'The same space',
+  title = 'One space, three states.',
+  intensity = 0.16,
+  displacement = '/images/general/displacement.jpg',
+} = Astro.props;
+
+const seqData = JSON.stringify({
+  frames: frames.map((f) => resolveImage(f.src).src),
+  displacement,
+  intensity,
+});
+---
+
+<section class="seq" data-seq aria-label={eyebrow}>
+  <div class="container container--wide seq__head" data-reveal>
+    <p class="eyebrow">{eyebrow}</p>
+    <h2 class="seq__title display">{title}</h2>
+  </div>
+
+  <div class="seq__track" data-seq-track>
+    <!-- WebGL stage (pinned). Hidden until JS confirms it is active. -->
+    <div class="seq__stage" aria-hidden="true">
+      <canvas class="seq__canvas" data-seq-canvas data-seq-config={seqData}></canvas>
+      <div class="seq__overlay">
+        <div class="seq__caps">
+          {frames.map((f, i) => (
+            <span class="seq__cap" data-seq-cap class:list={[i === 0 && 'is-active']}>{f.caption}</span>
+          ))}
+        </div>
+        <span class="seq__bar"><i data-seq-bar></i></span>
+      </div>
+    </div>
+
+    <!-- Cinematic fallback (also the no-JS / reduced-motion experience) -->
+    <div class="seq__fallback">
+      {frames.map((f, i) => (
+        <figure class="seq__frame" data-reveal>
+          <div class="seq__frame-media">
+            <ResponsiveImage src={f.src} alt={f.alt} sizes="(min-width:90rem) 80rem, 92vw" />
+          </div>
+          <figcaption class="seq__frame-cap">
+            <span class="seq__frame-num">{String(i + 1).padStart(2, '0')}</span>
+            <span class="seq__frame-text">{f.caption}</span>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .seq { background: var(--color-ink); color: var(--color-paper); padding-block: var(--section-y); }
+  .seq__head { margin-bottom: clamp(2rem, 1rem + 4vw, 4rem); }
+  .seq__head .eyebrow { color: rgba(245, 241, 234, 0.6); }
+  .seq__title { font-size: var(--fs-700); margin-top: 0.8rem; max-width: 20ch; }
+
+  /* ---------- Fallback (default) ---------- */
+  .seq__canvas, .seq__overlay { display: none; }
+  .seq__fallback {
+    display: grid;
+    gap: clamp(3rem, 2rem + 6vw, 7rem);
+  }
+  .seq__frame { position: relative; margin: 0; }
+  .seq__frame-media {
+    max-width: 80rem;
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .seq__frame-media :global(.rimg) { border-radius: var(--radius); overflow: hidden; }
+  .seq__frame-media :global(img) { width: 100%; display: block; }
+  .seq__frame-cap {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    max-width: 80rem;
+    margin: 1.25rem auto 0;
+    padding-inline: var(--gutter);
+  }
+  .seq__frame-num {
+    font-family: var(--font-display);
+    font-size: var(--fs-300);
+    color: var(--color-accent);
+  }
+  .seq__frame-text {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--fs-500);
+    color: rgba(245, 241, 234, 0.92);
+  }
+
+  /* ---------- WebGL mode ---------- */
+  .seq.is-webgl .seq__fallback { display: none; }
+  .seq.is-webgl .seq__track { height: 320vh; }
+  .seq.is-webgl .seq__stage {
+    display: block;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--color-ink);
+  }
+  .seq.is-webgl .seq__canvas { display: block; width: 100%; height: 100%; }
+  .seq.is-webgl .seq__overlay {
+    display: block;
+    position: absolute;
+    left: var(--gutter);
+    bottom: clamp(2.5rem, 1.5rem + 4vw, 5rem);
+    max-width: 24ch;
+    pointer-events: none;
+    text-shadow: 0 1px 30px rgba(0, 0, 0, 0.5);
+  }
+  .seq__caps { position: relative; min-height: 2.6em; }
+  .seq__cap {
+    position: absolute;
+    inset: 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--fs-600);
+    line-height: 1.1;
+    opacity: 0;
+    transform: translateY(0.45em);
+    transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+  }
+  .seq__cap.is-active { opacity: 1; transform: none; }
+  .seq__bar {
+    display: block;
+    margin-top: 1.5rem;
+    width: min(42vw, 16rem);
+    height: 2px;
+    background: rgba(245, 241, 234, 0.28);
+  }
+  .seq__bar i {
+    display: block; height: 100%;
+    background: var(--color-accent);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.1s linear;
+  }
+</style>
+
+<script>
+  import { initSequence } from '@/scripts/webgl/sequenceTransition';
+  document.querySelectorAll<HTMLElement>('[data-seq]').forEach((el) => {
+    initSequence(el).catch((e) => console.warn('Sequence WebGL skipped:', e));
+  });
+</script>

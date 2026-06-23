@@ -1,0 +1,57 @@
+---
+/**
+ * <ResponsiveImage> — a <picture> that serves WebP with a JPEG fallback at two
+ * widths (thumbnail + large), with intrinsic width/height baked in to prevent
+ * layout shift. All variants are pre-generated in /public/images.
+ */
+import { resolveImage } from '@lib/images';
+
+interface Props {
+  src: string;            // /images/.../name.jpg
+  alt: string;
+  sizes?: string;
+  class?: string;
+  /** Eagerly load + high priority (use for LCP / above-the-fold images). */
+  priority?: boolean;
+  /** Override intrinsic aspect ratio, e.g. "3 / 2". */
+  ratio?: string;
+}
+
+const { src, alt, sizes = '100vw', class: className, priority = false, ratio } = Astro.props;
+const img = resolveImage(src);
+const thumbW = Math.min(760, img.width);
+// When a ratio is forced, the picture box takes that ratio and the image
+// fills it via object-fit: cover (cropping, never stretching).
+const pictureStyle = ratio ? `aspect-ratio:${ratio}` : undefined;
+---
+
+<picture class:list={['rimg', ratio && 'rimg--cover', className]} style={pictureStyle}>
+  <source
+    type="image/webp"
+    srcset={`${img.thumbWebp} ${thumbW}w, ${img.webp} ${img.width}w`}
+    sizes={sizes}
+  />
+  <source
+    type="image/jpeg"
+    srcset={`${img.thumb} ${thumbW}w, ${img.src} ${img.width}w`}
+    sizes={sizes}
+  />
+  <img
+    src={img.src}
+    alt={alt}
+    width={img.width}
+    height={img.height}
+    sizes={sizes}
+    loading={priority ? 'eager' : 'lazy'}
+    decoding={priority ? 'sync' : 'async'}
+    fetchpriority={priority ? 'high' : 'auto'}
+  />
+</picture>
+
+<style>
+  .rimg { display: block; }
+  .rimg img { width: 100%; height: auto; }
+  /* Forced-ratio mode: fill the box and crop, never distort */
+  .rimg--cover { position: relative; overflow: hidden; }
+  .rimg--cover img { width: 100%; height: 100%; object-fit: cover; }
+</style>

@@ -1,0 +1,163 @@
+---
+/**
+ * <ProjectGallery> — a responsive masonry gallery with an accessible lightbox.
+ * Images lazy-load; only thumbnails are fetched until the lightbox opens.
+ */
+import ResponsiveImage from '@components/ui/ResponsiveImage.astro';
+
+type Figure = { src: string; alt: string; caption?: string };
+interface Props {
+  images: Figure[];
+  /** sizes hint for the grid thumbnails */
+  sizes?: string;
+}
+const { images, sizes = '(min-width: 64rem) 33vw, (min-width: 40rem) 50vw, 100vw' } = Astro.props;
+const galleryId = `gal-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<div class="gallery-root" data-gallery id={galleryId}>
+  <div class="gallery">
+  {images.map((img, i) => (
+    <figure class="gallery__item" data-reveal style={`--i:${i % 6}`}>
+      <button
+        type="button"
+        class="gallery__btn"
+        data-lightbox-open={i}
+        aria-label={`Open image: ${img.alt}`}
+      >
+        <ResponsiveImage src={img.src} alt={img.alt} sizes={sizes} class="gallery__img" />
+      </button>
+      {img.caption && <figcaption class="gallery__cap">{img.caption}</figcaption>}
+    </figure>
+  ))}
+  </div>
+
+  <!-- Lightbox -->
+<dialog class="lightbox" data-lightbox aria-label="Image viewer">
+  <button class="lightbox__close" data-lightbox-close aria-label="Close viewer">
+    <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 3l16 16M19 3L3 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+  </button>
+  <button class="lightbox__nav lightbox__nav--prev" data-lightbox-prev aria-label="Previous image">
+    <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M19 4L9 15l10 11" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <figure class="lightbox__figure">
+    <img class="lightbox__img" data-lightbox-img alt="" />
+    <figcaption class="lightbox__cap" data-lightbox-cap></figcaption>
+  </figure>
+  <button class="lightbox__nav lightbox__nav--next" data-lightbox-next aria-label="Next image">
+    <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M11 4l10 11L11 26" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+</dialog>
+
+<script
+  is:inline
+  type="application/json"
+  data-gallery-data={galleryId}
+  set:html={JSON.stringify(images.map((i) => ({
+    src: i.src,
+    webp: i.src.replace(/\.jpg$/, '.webp'),
+    alt: i.alt,
+    caption: i.caption ?? '',
+  })))}
+/>
+</div>
+
+<style>
+  .gallery {
+    columns: 3 18rem;
+    column-gap: clamp(0.75rem, 0.3rem + 1.5vw, 1.5rem);
+  }
+  .gallery__item {
+    break-inside: avoid;
+    margin: 0 0 clamp(0.75rem, 0.3rem + 1.5vw, 1.5rem);
+  }
+  .gallery__btn {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: var(--color-paper-2);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .gallery__img :global(img) {
+    width: 100%;
+    transition: transform 0.7s var(--ease-out), filter var(--dur) var(--ease-out);
+  }
+  .gallery__btn:hover .gallery__img :global(img) { transform: scale(1.04); }
+  .gallery__cap {
+    margin-top: 0.6rem;
+    font-size: var(--fs-200);
+    color: var(--color-muted);
+  }
+
+  /* Lightbox */
+  .lightbox {
+    width: min(100vw, 100%);
+    max-width: 100vw;
+    max-height: 100vh;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: color-mix(in srgb, var(--color-ink) 96%, black);
+    color: var(--color-paper);
+  }
+  .lightbox::backdrop { background: rgba(0, 0, 0, 0.85); }
+  .lightbox[open] { display: grid; }
+  .lightbox {
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.5rem;
+    place-items: center;
+  }
+  .lightbox__figure {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: clamp(1rem, 5vw, 4rem);
+  }
+  .lightbox__img {
+    max-width: min(92vw, 1400px);
+    max-height: 82vh;
+    width: auto; height: auto;
+    object-fit: contain;
+    border-radius: var(--radius);
+  }
+  .lightbox__cap {
+    font-size: var(--fs-200);
+    color: rgba(245, 241, 234, 0.75);
+    text-align: center;
+    max-width: 60ch;
+  }
+  .lightbox__close, .lightbox__nav {
+    grid-row: 1;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-paper);
+    border: none;
+    border-radius: 999px;
+    width: 3rem; height: 3rem;
+    display: grid; place-items: center;
+    transition: background var(--dur-fast) var(--ease-out);
+  }
+  .lightbox__close:hover, .lightbox__nav:hover { background: rgba(255, 255, 255, 0.2); }
+  .lightbox__close { position: absolute; top: 1.25rem; right: 1.25rem; }
+  .lightbox__nav--prev { grid-column: 1; margin-left: 0.75rem; }
+  .lightbox__nav--next { grid-column: 3; margin-right: 0.75rem; }
+
+  @media (max-width: 40rem) {
+    .lightbox__nav { width: 2.5rem; height: 2.5rem; }
+  }
+</style>
+
+<script>
+  import { initGallery } from '@/scripts/gallery';
+  initGallery();
+</script>

@@ -1,0 +1,38 @@
+---
+import Layout from '@components/layout/Layout.astro';
+import Hero from '@components/sections/Hero.astro';
+import FeaturedProjects from '@components/sections/FeaturedProjects.astro';
+import ServicesPreview from '@components/sections/ServicesPreview.astro';
+import AboutPreview from '@components/sections/AboutPreview.astro';
+import { site } from '@lib/site';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  jobTitle: site.role,
+  url: site.url,
+  description: site.description,
+  email: site.contact.email,
+  address: { '@type': 'PostalAddress', addressLocality: site.contact.location },
+  sameAs: site.social.map((s) => s.href),
+};
+---
+
+<Layout
+  description={site.description}
+  jsonLd={jsonLd}
+  mainClass="home"
+>
+  <Hero />
+  <FeaturedProjects />
+  <AboutPreview />
+  <ServicesPreview />
+
+  <script>
+    import { initHero } from '@/scripts/animations/hero';
+    import { initHeroRipple } from '@/scripts/webgl/heroRipple';
+    initHeroRipple();
+    initHero();
+  </script>
+</Layout>

@@ -1,0 +1,85 @@
+---
+import Layout from '@components/layout/Layout.astro';
+import ResponsiveImage from '@components/ui/ResponsiveImage.astro';
+import { site } from '@lib/site';
+---
+
+<Layout
+  title="About"
+  description="About Nasia Kouklaki — a passionate interior architect pairing strong technical skills with an artist's eye for material, light and composition."
+>
+  <section class="section about-hero">
+    <div class="container container--wide">
+      <p class="eyebrow" data-reveal>About</p>
+      <h1 class="about-hero__title display" data-reveal>
+        A passionate interior architect — equal parts technician and artist.
+      </h1>
+    </div>
+  </section>
+
+  <section class="section--tight">
+    <div class="container container--wide about-grid">
+      <div class="about-grid__media" data-reveal data-parallax>
+        <ResponsiveImage
+          src="/images/projects/living-together/gallery/living-lounge.jpg"
+          alt="A warm, daylit lounge from the Living Together project, reflecting Nasia Kouklaki's design sensibility."
+          sizes="(min-width:60rem) 42vw, 100vw"
+          ratio="4 / 5"
+        />
+      </div>
+
+      <div class="about-grid__body prose" data-reveal>
+        <p class="lead">
+          {site.name} is an interior architect with a strong command of both the
+          technical tools of the discipline and its art. She designs interiors
+          that are carefully planned and detailed, yet expressive — spaces with a
+          point of view.
+        </p>
+        <p>
+          Her practice moves comfortably between the precise and the poetic: the
+          drawings, plans and construction detail that make a project buildable,
+          and the composition, material and light that make it worth being in.
+          That dual fluency runs through everything — whether shaping a communal
+          residence around the way people gather, or reading the alphabet hidden
+          in the railings and shadows of a coastal street.
+        </p>
+        <h2>How I work</h2>
+        <p>
+          I believe good interiors begin with listening — to the people who will
+          use a space, and to the building itself. From there I develop a single,
+          clear idea and carry it through every scale, from the overall plan down
+          to a door handle. The result is calm, coherent spaces with a tight,
+          intentional material language and a real sense of warmth.
+        </p>
+        <h2>Principles</h2>
+        <ul>
+          <li><strong>Plan first.</strong> Generous circulation, clear sightlines and accessibility built in from the start.</li>
+          <li><strong>Material honesty.</strong> A small palette of timber, tile and tone, used with intent.</li>
+          <li><strong>Light as a material.</strong> Working with daylight, and layering it carefully where it's needed.</li>
+          <li><strong>Detail that lasts.</strong> Bespoke joinery and furniture designed to fit the room and the people in it.</li>
+        </ul>
+        <p>
+          <a href="/contact/" class="link-underline">Get in touch</a> to talk
+          through a project, or <a href="/projects/" class="link-underline">explore the work</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .about-hero__title { font-size: var(--fs-800); margin-top: 0.6rem; max-width: 20ch; }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: clamp(2rem, 1rem + 5vw, 5.5rem);
+    align-items: start;
+  }
+  .about-grid__media :global(.rimg) { border-radius: var(--radius); overflow: hidden; position: sticky; top: calc(var(--header-h) + 1.5rem); }
+  .about-grid__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  @media (max-width: 56rem) {
+    .about-grid { grid-template-columns: 1fr; }
+    .about-grid__media { max-width: 28rem; }
+    .about-grid__media :global(.rimg) { position: static; }
+  }
+</style>

@@ -1,0 +1,62 @@
+/* =========================================================================
+   Design tokens
+   Palette is drawn from the studio's own work: warm paper, near-black ink,
+   and the signature terracotta red that runs through the interiors.
+   ========================================================================= */
+:root {
+  /* ---- Colour ---- */
+  --color-paper: #f4efe6;        /* page background — warm ivory */
+  --color-paper-2: #eae2d5;      /* slightly deeper panel background */
+  --color-paper-3: #e2d8c8;      /* deepest neutral panel */
+  --color-ink: #1f1b16;          /* primary text — warm near-black */
+  --color-ink-soft: #544d43;     /* secondary text */
+  --color-muted: #8c8377;        /* captions, meta, labels */
+  --color-line: rgba(31, 27, 22, 0.13);
+  --color-line-strong: rgba(31, 27, 22, 0.26);
+  --color-accent: #c0432a;       /* signature terracotta red */
+  --color-accent-deep: #98311b;
+  --color-sand: #d8cab4;         /* plywood / sand neutral */
+  --color-on-accent: #f7efe6;
+
+  --shadow-soft: 0 24px 60px -28px rgba(31, 27, 22, 0.35);
+  --shadow-card: 0 18px 48px -30px rgba(31, 27, 22, 0.45);
+
+  /* ---- Typography ---- */
+  --font-display: 'Fraunces', 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  --fs-100: 0.75rem;    /* 12 — micro labels */
+  --fs-200: 0.875rem;   /* 14 — meta */
+  --fs-300: 1rem;       /* 16 — body */
+  --fs-400: 1.125rem;   /* 18 — lead body */
+  --fs-500: clamp(1.25rem, 1.05rem + 0.9vw, 1.6rem);
+  --fs-600: clamp(1.6rem, 1.2rem + 1.8vw, 2.4rem);
+  --fs-700: clamp(2.2rem, 1.4rem + 3.4vw, 3.9rem);
+  --fs-800: clamp(2.9rem, 1.5rem + 6.4vw, 6.5rem);
+  --fs-900: clamp(3.6rem, 1.4rem + 9.5vw, 10rem);
+
+  --lh-tight: 1.04;
+  --lh-snug: 1.18;
+  --lh-body: 1.6;
+
+  --tracking-label: 0.18em;
+  --tracking-wide: 0.06em;
+
+  /* ---- Layout ---- */
+  --container: 80rem;        /* 1280px */
+  --container-wide: 90rem;   /* 1440px */
+  --container-text: 44rem;   /* readable measure */
+  --gutter: clamp(1.25rem, 0.5rem + 3.5vw, 4rem);
+  --section-y: clamp(4rem, 2rem + 8vw, 9rem);
+
+  --radius: 2px;
+
+  /* ---- Motion ---- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 0.25s;
+  --dur: 0.5s;
+  --dur-slow: 0.8s;
+
+  --header-h: 4.75rem;
+}

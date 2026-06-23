@@ -1,0 +1,24 @@
+{
+  "name": "nasia-kouklaki-portfolio",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Portfolio website for interior architect Nasia Kouklaki",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.2.0",
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^5.6.0",
+    "gsap": "^3.12.5",
+    "lenis": "^1.1.18",
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.169.0"
+  }
+}

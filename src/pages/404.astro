@@ -1,0 +1,25 @@
+---
+import Layout from '@components/layout/Layout.astro';
+---
+
+<Layout title="Page not found" noindex>
+  <section class="section notfound">
+    <div class="container container--text">
+      <p class="eyebrow">404</p>
+      <h1 class="display notfound__title">This page has moved on.</h1>
+      <p class="lead">
+        The page you’re looking for doesn’t exist or may have been relocated.
+      </p>
+      <div class="notfound__actions">
+        <a href="/" class="btn">Back home</a>
+        <a href="/projects/" class="btn btn--outline">View the work</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .notfound { min-height: 60svh; display: grid; align-items: center; }
+  .notfound__title { font-size: var(--fs-800); margin: 0.6rem 0 1rem; }
+  .notfound__actions { display: flex; gap: 0.85rem; margin-top: 2rem; flex-wrap: wrap; }
+</style>

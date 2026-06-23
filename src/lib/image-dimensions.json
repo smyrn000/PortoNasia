@@ -1,0 +1,230 @@
+{
+"/images/general/concept-living-together.jpg": {
+"h": 1960,
+"w": 1400
+},
+"/images/general/displacement.jpg": {
+"h": 1024,
+"w": 1024
+},
+"/images/general/home-hero.jpg": {
+"h": 1125,
+"w": 2000
+},
+"/images/general/og-default.jpg": {
+"h": 630,
+"w": 1200
+},
+"/images/projects/architectural-alphabet/alphabet-cover.jpg": {
+"h": 1036,
+"w": 1510
+},
+"/images/projects/architectural-alphabet/alphabet-sheet.jpg": {
+"h": 2799,
+"w": 1400
+},
+"/images/projects/architectural-alphabet/letter-01.jpg": {
+"h": 503,
+"w": 365
+},
+"/images/projects/architectural-alphabet/letter-02.jpg": {
+"h": 503,
+"w": 366
+},
+"/images/projects/architectural-alphabet/letter-03.jpg": {
+"h": 503,
+"w": 365
+},
+"/images/projects/architectural-alphabet/letter-04.jpg": {
+"h": 503,
+"w": 366
+},
+"/images/projects/architectural-alphabet/letter-05.jpg": {
+"h": 503,
+"w": 365
+},
+"/images/projects/architectural-alphabet/letter-06.jpg": {
+"h": 503,
+"w": 366
+},
+"/images/projects/architectural-alphabet/letter-07.jpg": {
+"h": 503,
+"w": 365
+},
+"/images/projects/architectural-alphabet/letter-08.jpg": {
+"h": 503,
+"w": 366
+},
+"/images/projects/architectural-alphabet/letter-09.jpg": {
+"h": 503,
+"w": 365
+},
+"/images/projects/architectural-alphabet/letter-10.jpg": {
+"h": 503,
+"w": 366
+},
+"/images/projects/architectural-alphabet/letter-11.jpg": {
+"h": 503,
+"w": 365
+},
+"/images/projects/architectural-alphabet/letter-12.jpg": {
+"h": 503,
+"w": 366
+},
+"/images/projects/architectural-alphabet/letter-13.jpg": {
+"h": 503,
+"w": 365
+},
+"/images/projects/architectural-alphabet/letter-14.jpg": {
+"h": 503,
+"w": 366
+},
+"/images/projects/architectural-alphabet/letter-15.jpg": {
+"h": 503,
+"w": 365
+},
+"/images/projects/architectural-alphabet/letter-16.jpg": {
+"h": 503,
+"w": 366
+},
+"/images/projects/architectural-alphabet/letter-17.jpg": {
+"h": 503,
+"w": 365
+},
+"/images/projects/architectural-alphabet/letter-18.jpg": {
+"h": 503,
+"w": 366
+},
+"/images/projects/architectural-alphabet/letter-19.jpg": {
+"h": 503,
+"w": 365
+},
+"/images/projects/architectural-alphabet/letter-20.jpg": {
+"h": 503,
+"w": 366
+},
+"/images/projects/architectural-alphabet/letter-21.jpg": {
+"h": 504,
+"w": 365
+},
+"/images/projects/architectural-alphabet/letter-22.jpg": {
+"h": 504,
+"w": 366
+},
+"/images/projects/architectural-alphabet/letter-23.jpg": {
+"h": 504,
+"w": 365
+},
+"/images/projects/architectural-alphabet/letter-24.jpg": {
+"h": 504,
+"w": 366
+},
+"/images/projects/living-together/gallery/accessible-bathroom.jpg": {
+"h": 1086,
+"w": 1448
+},
+"/images/projects/living-together/gallery/bathroom-green.jpg": {
+"h": 1312,
+"w": 1199
+},
+"/images/projects/living-together/gallery/bedroom-detail.jpg": {
+"h": 1021,
+"w": 1152
+},
+"/images/projects/living-together/gallery/bedroom-green.jpg": {
+"h": 1143,
+"w": 1800
+},
+"/images/projects/living-together/gallery/bunk-room.jpg": {
+"h": 1440,
+"w": 1152
+},
+"/images/projects/living-together/gallery/communal-dining-hall.jpg": {
+"h": 1012,
+"w": 1800
+},
+"/images/projects/living-together/gallery/communal-kitchen.jpg": {
+"h": 1170,
+"w": 1800
+},
+"/images/projects/living-together/gallery/corridor-light.jpg": {
+"h": 1031,
+"w": 1800
+},
+"/images/projects/living-together/gallery/dining-overview.jpg": {
+"h": 1012,
+"w": 1800
+},
+"/images/projects/living-together/gallery/dining-pendants.jpg": {
+"h": 1132,
+"w": 1800
+},
+"/images/projects/living-together/gallery/entry-doors.jpg": {
+"h": 1440,
+"w": 1152
+},
+"/images/projects/living-together/gallery/kitchen-blue.jpg": {
+"h": 1407,
+"w": 1059
+},
+"/images/projects/living-together/gallery/living-lounge.jpg": {
+"h": 1402,
+"w": 1122
+},
+"/images/projects/living-together/gallery/private-bedroom.jpg": {
+"h": 1041,
+"w": 1800
+},
+"/images/projects/living-together/gallery/reading-nook.jpg": {
+"h": 1440,
+"w": 1152
+},
+"/images/projects/living-together/gallery/red-screen-corridor.jpg": {
+"h": 1078,
+"w": 1800
+},
+"/images/projects/living-together/gallery/shared-dining.jpg": {
+"h": 941,
+"w": 1672
+},
+"/images/projects/living-together/gallery/soft-lounge.jpg": {
+"h": 1402,
+"w": 1122
+},
+"/images/projects/living-together/plans/elevation.jpg": {
+"h": 1413,
+"w": 2000
+},
+"/images/projects/living-together/plans/ground-floor-plan.jpg": {
+"h": 1188,
+"w": 2000
+},
+"/images/projects/living-together/plans/material-variations.jpg": {
+"h": 1414,
+"w": 2000
+},
+"/images/projects/living-together/plans/modular-furniture.jpg": {
+"h": 1414,
+"w": 2000
+},
+"/images/projects/living-together/plans/section-aa.jpg": {
+"h": 1413,
+"w": 2000
+},
+"/images/projects/living-together/plans/section-bb.jpg": {
+"h": 1413,
+"w": 2000
+},
+"/images/projects/living-together/sequence/seq-1.jpg": {
+"h": 916,
+"w": 1600
+},
+"/images/projects/living-together/sequence/seq-2.jpg": {
+"h": 1021,
+"w": 1152
+},
+"/images/projects/living-together/sequence/seq-3.jpg": {
+"h": 1200,
+"w": 1600
+}
+}

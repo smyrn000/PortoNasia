@@ -1,0 +1,111 @@
+---
+import { site, navLinks } from '@lib/site';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer" data-reveal>
+  <div class="container container--wide">
+    <div class="site-footer__top">
+      <div class="site-footer__lead">
+        <p class="eyebrow">Get in touch</p>
+        <p class="site-footer__cta display">
+          Let’s make something<br />worth living in.
+        </p>
+        <a href="/contact/" class="btn btn--accent">Start a conversation</a>
+      </div>
+
+      <div class="site-footer__cols">
+        <nav class="site-footer__col" aria-label="Footer">
+          <h2 class="site-footer__h">Menu</h2>
+          <ul role="list">
+            {navLinks.map((l) => (
+              <li><a href={l.href} class="link-underline">{l.label}</a></li>
+            ))}
+          </ul>
+        </nav>
+
+        <div class="site-footer__col">
+          <h2 class="site-footer__h">Contact</h2>
+          <ul role="list">
+            <li><a href={`mailto:${site.contact.email}`} class="link-underline">{site.contact.email}</a></li>
+            <li><a href={`tel:${site.contact.phone.replace(/\s+/g, '')}`} class="link-underline">{site.contact.phone}</a></li>
+            <li>{site.contact.location}</li>
+          </ul>
+        </div>
+
+        <div class="site-footer__col">
+          <h2 class="site-footer__h">Elsewhere</h2>
+          <ul role="list">
+            {site.social.map((s) => (
+              <li>
+                <a href={s.href} class="link-underline" target="_blank" rel="noopener noreferrer">
+                  {s.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom">
+      <span>© {year} {site.name}</span>
+      <span>{site.role}</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    padding-block: clamp(3.5rem, 2rem + 5vw, 6rem) 2rem;
+    margin-top: var(--section-y);
+  }
+  .site-footer__top {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: clamp(2.5rem, 1rem + 5vw, 6rem);
+    padding-bottom: clamp(2.5rem, 1.5rem + 3vw, 4rem);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  }
+  .site-footer .eyebrow { color: rgba(245, 241, 234, 0.6); }
+  .site-footer__cta {
+    font-size: var(--fs-700);
+    margin: 0.6em 0 1.4rem;
+    color: var(--color-paper);
+  }
+  .site-footer__cols {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+  .site-footer__h {
+    font-family: var(--font-body);
+    font-size: var(--fs-100);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: rgba(245, 241, 234, 0.55);
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+  .site-footer__col ul { display: grid; gap: 0.6rem; }
+  .site-footer__col a, .site-footer__col li { color: rgba(245, 241, 234, 0.85); font-size: var(--fs-200); }
+
+  .site-footer__bottom {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 1.75rem;
+    font-size: var(--fs-100);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: rgba(245, 241, 234, 0.5);
+  }
+
+  @media (max-width: 52rem) {
+    .site-footer__top { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 34rem) {
+    .site-footer__cols { grid-template-columns: 1fr 1fr; }
+  }
+</style>

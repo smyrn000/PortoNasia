@@ -1,0 +1,111 @@
+---
+import Layout from '@components/layout/Layout.astro';
+import { services, process } from '@lib/services';
+---
+
+<Layout
+  title="Services"
+  description="Interior architecture services by Nasia Kouklaki — interior architecture, space planning, material and colour, custom joinery, lighting design and visualisation."
+>
+  <section class="section page-intro">
+    <div class="container container--wide">
+      <p class="eyebrow" data-reveal>Services</p>
+      <h1 class="page-intro__title display" data-reveal>
+        How I can help.
+      </h1>
+      <p class="lead measure" data-reveal>
+        A focused interior architecture practice that covers the full journey —
+        from the first idea to a finished, well-detailed, accessible space.
+      </p>
+    </div>
+  </section>
+
+  <section class="section--tight">
+    <div class="container container--wide">
+      <ul class="services-list" role="list">
+        {services.map((s, i) => (
+          <li class="services-list__item" data-reveal style={`--i:${i % 3}`}>
+            <span class="services-list__num">{String(i + 1).padStart(2, '0')}</span>
+            <div>
+              <h2>{s.title}</h2>
+              <p>{s.summary}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section process">
+    <div class="container container--wide">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Process</p>
+        <h2 class="section-head__title">A simple, four-step way of working.</h2>
+      </div>
+      <ol class="process__list" role="list">
+        {process.map((p, i) => (
+          <li class="process__item" data-reveal style={`--i:${i}`}>
+            <span class="process__step">{p.step}</span>
+            <h3>{p.title}</h3>
+            <p>{p.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section--tight">
+    <div class="container container--wide services-cta" data-reveal>
+      <h2 class="display">Have a project in mind?</h2>
+      <a href="/contact/" class="btn btn--accent">Get in touch</a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .page-intro__title { font-size: var(--fs-800); margin: 0.6rem 0 1.5rem; }
+
+  .services-list { display: grid; gap: 0; }
+  .services-list__item {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    gap: clamp(1rem, 0.5rem + 2vw, 3rem);
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem) 0;
+    border-top: 1px solid var(--color-line);
+    align-items: start;
+  }
+  .services-list__item:last-child { border-bottom: 1px solid var(--color-line); }
+  .services-list__num {
+    font-family: var(--font-display);
+    font-size: var(--fs-500);
+    color: var(--color-accent);
+  }
+  .services-list__item h2 { font-size: var(--fs-500); margin-bottom: 0.5rem; }
+  .services-list__item p { color: var(--color-ink-soft); max-width: 56ch; }
+
+  .process { background: var(--color-paper-2); }
+  .process__list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  }
+  .process__item { border-top: 2px solid var(--color-ink); padding-top: 1rem; }
+  .process__step {
+    font-family: var(--font-display); font-size: var(--fs-600); color: var(--color-accent);
+    display: block; margin-bottom: 0.4rem;
+  }
+  .process__item h3 { font-size: var(--fs-400); margin-bottom: 0.4rem; }
+  .process__item p { font-size: var(--fs-200); color: var(--color-ink-soft); line-height: 1.6; }
+
+  .services-cta {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1.5rem;
+  }
+  .services-cta h2 { font-size: var(--fs-700); }
+
+  @media (max-width: 52rem) { .process__list { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 32rem) {
+    .process__list { grid-template-columns: 1fr; }
+    .services-list__item { grid-template-columns: 1fr; gap: 0.5rem; }
+  }
+</style>

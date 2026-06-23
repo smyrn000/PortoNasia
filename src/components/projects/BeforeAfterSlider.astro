@@ -1,0 +1,92 @@
+---
+/**
+ * <BeforeAfterSlider> — a draggable/keyboard-accessible before & after wipe.
+ * Used only when a project provides a `beforeAfter` entry. Falls back to two
+ * stacked images if JS is disabled.
+ */
+import ResponsiveImage from '@components/ui/ResponsiveImage.astro';
+
+type Figure = { src: string; alt: string };
+interface Props {
+  before: Figure;
+  after: Figure;
+  label?: string;
+}
+const { before, after, label } = Astro.props;
+const id = `ba-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<figure class="ba" data-before-after id={id} data-reveal>
+  <div class="ba__frame">
+    <div class="ba__after">
+      <ResponsiveImage src={after.src} alt={after.alt} sizes="(min-width:64rem) 70vw, 100vw" />
+      <span class="ba__tag ba__tag--after">After</span>
+    </div>
+    <div class="ba__before" data-ba-before>
+      <ResponsiveImage src={before.src} alt={before.alt} sizes="(min-width:64rem) 70vw, 100vw" />
+      <span class="ba__tag ba__tag--before">Before</span>
+    </div>
+    <input
+      type="range" min="0" max="100" value="50"
+      class="ba__range" data-ba-range
+      aria-label={label ? `Reveal ${label}` : 'Reveal before and after'}
+    />
+    <span class="ba__handle" data-ba-handle aria-hidden="true"></span>
+  </div>
+  {label && <figcaption class="ba__cap">{label}</figcaption>}
+</figure>
+
+<style>
+  .ba__frame { position: relative; overflow: hidden; border-radius: var(--radius); user-select: none; }
+  .ba__after, .ba__before { grid-area: 1 / 1; }
+  .ba__after { display: block; }
+  .ba__before {
+    position: absolute; inset: 0;
+    width: 50%;
+    overflow: hidden;
+    border-right: 2px solid var(--color-paper);
+  }
+  .ba__before :global(img), .ba__after :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .ba__before :global(.rimg) { width: max(100%, 100cqw); }
+  .ba__tag {
+    position: absolute; bottom: 1rem;
+    font-size: var(--fs-100); letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    background: color-mix(in srgb, var(--color-paper) 90%, transparent);
+    padding: 0.35em 0.7em; border-radius: var(--radius);
+  }
+  .ba__tag--before { left: 1rem; } .ba__tag--after { right: 1rem; }
+  .ba__range {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    opacity: 0; cursor: ew-resize; margin: 0;
+  }
+  .ba__handle {
+    position: absolute; top: 0; bottom: 0; left: 50%;
+    width: 2px; background: var(--color-paper); transform: translateX(-1px);
+    pointer-events: none;
+  }
+  .ba__handle::after {
+    content: '';
+    position: absolute; top: 50%; left: 50%;
+    width: 2.5rem; height: 2.5rem; transform: translate(-50%, -50%);
+    border: 2px solid var(--color-paper); border-radius: 999px;
+    background: color-mix(in srgb, var(--color-ink) 30%, transparent);
+  }
+  .ba__cap { margin-top: 0.6rem; font-size: var(--fs-200); color: var(--color-muted); }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-before-after]').forEach((el) => {
+    const range = el.querySelector<HTMLInputElement>('[data-ba-range]');
+    const before = el.querySelector<HTMLElement>('[data-ba-before]');
+    const handle = el.querySelector<HTMLElement>('[data-ba-handle]');
+    if (!range || !before || !handle) return;
+    const update = () => {
+      const v = range.value;
+      before.style.width = `${v}%`;
+      handle.style.left = `${v}%`;
+    };
+    range.addEventListener('input', update);
+    update();
+  });
+</script>

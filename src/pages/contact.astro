@@ -1,0 +1,81 @@
+---
+import Layout from '@components/layout/Layout.astro';
+import { site } from '@lib/site';
+const tel = site.contact.phone.replace(/\s+/g, '');
+---
+
+<Layout
+  title="Contact"
+  description="Get in touch with interior architect Nasia Kouklaki to discuss a project, a collaboration or a commission."
+>
+  <section class="section contact">
+    <div class="container container--wide contact__grid">
+      <div class="contact__intro" data-reveal>
+        <p class="eyebrow">Contact</p>
+        <h1 class="display contact__title">
+          Let’s talk about<br />your space.
+        </h1>
+        <p class="lead">
+          Whether it’s a home, a shared living project or a collaboration, I’d
+          love to hear about it. Reach out directly and I’ll get back to you.
+        </p>
+      </div>
+
+      <div class="contact__details" data-reveal>
+        <ul class="contact__list" role="list">
+          <li>
+            <span class="contact__label">Email</span>
+            <a href={`mailto:${site.contact.email}`} class="contact__value link-underline">
+              {site.contact.email}
+            </a>
+          </li>
+          <li>
+            <span class="contact__label">Phone</span>
+            <a href={`tel:${tel}`} class="contact__value link-underline">{site.contact.phone}</a>
+          </li>
+          <li>
+            <span class="contact__label">Based in</span>
+            <span class="contact__value">{site.contact.location}</span>
+          </li>
+          <li>
+            <span class="contact__label">Elsewhere</span>
+            <span class="contact__socials">
+              {site.social.map((s) => (
+                <a href={s.href} class="link-underline" target="_blank" rel="noopener noreferrer">{s.label}</a>
+              ))}
+            </span>
+          </li>
+        </ul>
+
+        <a href={`mailto:${site.contact.email}`} class="btn btn--accent contact__btn">
+          Send an email
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .contact__grid {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(2.5rem, 1rem + 6vw, 6rem);
+    align-items: start;
+  }
+  .contact__title { font-size: var(--fs-800); margin: 0.6rem 0 1.5rem; }
+
+  .contact__list { display: grid; gap: 1.75rem; }
+  .contact__list li {
+    display: grid; gap: 0.4rem;
+    border-top: 1px solid var(--color-line); padding-top: 1.1rem;
+  }
+  .contact__label {
+    font-size: var(--fs-100); letter-spacing: var(--tracking-label);
+    text-transform: uppercase; color: var(--color-muted);
+  }
+  .contact__value { font-family: var(--font-display); font-size: var(--fs-500); }
+  .contact__socials { display: flex; gap: 1.25rem; flex-wrap: wrap; font-size: var(--fs-400); }
+  .contact__btn { margin-top: 2.5rem; }
+
+  @media (max-width: 52rem) { .contact__grid { grid-template-columns: 1fr; } }
+</style>
